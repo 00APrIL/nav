@@ -48,34 +48,44 @@ export default function Home() {
     }
   }, [categories])
 
-  // 添加或编辑网站
-  const handleSaveSite = (site, categoryId) => {
-    if (editingSite) {
-      // 编辑现有网站
-      setCategories(categories.map(category => {
-        if (category.id === categoryId) {
-          return {
-            ...category,
-            sites: category.sites.map(s => s.id === site.id ? site : s)
-          }
-        }
-        return category
-      }))
-    } else {
-      // 添加新网站
-      setCategories(categories.map(category => {
-        if (category.id === categoryId) {
-          return {
-            ...category,
-            sites: [...category.sites, { ...site, id: Date.now().toString() }]
-          }
-        }
-        return category
-      }))
-    }
-    setShowModal(false)
-    setEditingSite(null)
+// 添加或编辑网站
+const handleSaveSite = (site, categoryId) => {
+  // 确保categoryId是有效的
+  const targetCategoryId = categoryId || categories[0]?.id;
+  
+  // 确保有分类可用
+  if (!targetCategoryId || !categories.length) {
+    alert('没有可用的分类，请先添加分类');
+    setShowModal(false);
+    return;
   }
+  
+  if (editingSite) {
+    // 编辑现有网站
+    setCategories(categories.map(category => {
+      if (category.id === targetCategoryId) {
+        return {
+          ...category,
+          sites: category.sites.map(s => s.id === site.id ? site : s)
+        }
+      }
+      return category
+    }))
+  } else {
+    // 添加新网站
+    setCategories(categories.map(category => {
+      if (category.id === targetCategoryId) {
+        return {
+          ...category,
+          sites: [...category.sites, { ...site, id: Date.now().toString() }]
+        }
+      }
+      return category
+    }))
+  }
+  setShowModal(false)
+  setEditingSite(null)
+}
 
   // 删除网站
   const handleDeleteSite = (siteId, categoryId) => {
