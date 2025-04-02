@@ -48,44 +48,44 @@ export default function Home() {
     }
   }, [categories])
 
-// 添加或编辑网站
-const handleSaveSite = (site, categoryId) => {
-  // 确保categoryId是有效的
-  const targetCategoryId = categoryId || categories[0]?.id;
-  
-  // 确保有分类可用
-  if (!targetCategoryId || !categories.length) {
-    alert('没有可用的分类，请先添加分类');
-    setShowModal(false);
-    return;
-  }
-  
-  if (editingSite) {
-    // 编辑现有网站
-    setCategories(categories.map(category => {
-      if (category.id === targetCategoryId) {
-        return {
-          ...category,
-          sites: category.sites.map(s => s.id === site.id ? site : s)
+  // 添加或编辑网站
+  const handleSaveSite = (site, categoryId) => {
+    // 确保categoryId是有效的
+    const targetCategoryId = categoryId || categories[0]?.id;
+    
+    // 确保有分类可用
+    if (!targetCategoryId || !categories.length) {
+      alert('没有可用的分类，请先添加分类');
+      setShowModal(false);
+      return;
+    }
+    
+    if (editingSite) {
+      // 编辑现有网站
+      setCategories(categories.map(category => {
+        if (category.id === targetCategoryId) {
+          return {
+            ...category,
+            sites: category.sites.map(s => s.id === site.id ? site : s)
+          }
         }
-      }
-      return category
-    }))
-  } else {
-    // 添加新网站
-    setCategories(categories.map(category => {
-      if (category.id === targetCategoryId) {
-        return {
-          ...category,
-          sites: [...category.sites, { ...site, id: Date.now().toString() }]
+        return category
+      }))
+    } else {
+      // 添加新网站
+      setCategories(categories.map(category => {
+        if (category.id === targetCategoryId) {
+          return {
+            ...category,
+            sites: [...category.sites, { ...site, id: Date.now().toString() }]
+          }
         }
-      }
-      return category
-    }))
+        return category
+      }))
+    }
+    setShowModal(false)
+    setEditingSite(null)
   }
-  setShowModal(false)
-  setEditingSite(null)
-}
 
   // 删除网站
   const handleDeleteSite = (siteId, categoryId) => {
@@ -203,12 +203,11 @@ const handleSaveSite = (site, categoryId) => {
             key={category.id}
             category={category}
             onAddSite={() => {
-              setEditingSite(null)
-              setShowModal(true)
+              setEditingSite(null);
+              setShowModal(true);
             }}
             onEditSite={(site) => handleEditSite(site, category.id)}
             onDeleteSite={(siteId) => handleDeleteSite(siteId, category.id)}
-            onSave={(site) => handleSaveSite(site, category.id)}
           />
         ))}
       </main>
@@ -220,13 +219,16 @@ const handleSaveSite = (site, categoryId) => {
       {showModal && (
         <AddSiteModal 
           onClose={() => {
-            setShowModal(false)
-            setEditingSite(null)
+            setShowModal(false);
+            setEditingSite(null);
           }}
-          onSave={(site) => handleSaveSite(site, editingSite ? editingSite.categoryId : categories[0].id)}
+          onSave={(site) => {
+            const categoryId = editingSite ? editingSite.categoryId : (categories[0]?.id || '');
+            handleSaveSite(site, categoryId);
+          }}
           editSite={editingSite?.site}
           categories={categories}
-          selectedCategoryId={editingSite?.categoryId || categories[0].id}
+          selectedCategoryId={editingSite?.categoryId || categories[0]?.id || ''}
         />
       )}
     </div>
