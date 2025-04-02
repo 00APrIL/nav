@@ -1,7 +1,11 @@
 import { FiPlus, FiEdit2, FiTrash2 } from 'react-icons/fi'
-import SiteCard from './SiteCards'
+import SiteCard from './SiteCard'
 
 export default function SiteCategory({ category, onAddSite, onEditSite, onDeleteSite }) {
+  if (!category || !category.sites) {
+    return null; // 如果分类数据无效，不渲染任何内容
+  }
+  
   return (
     <div className="mb-8">
       <div className="flex items-center justify-between mb-4">
