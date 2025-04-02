@@ -1,5 +1,5 @@
 import { FiPlus, FiEdit2, FiTrash2 } from 'react-icons/fi'
-import SiteCard from './SiteCard'
+import SiteCard from './SiteCards'
 
 export default function SiteCategory({ category, onAddSite, onEditSite, onDeleteSite }) {
   return (
