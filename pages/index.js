@@ -222,8 +222,11 @@ export default function Home() {
             setShowModal(false);
             setEditingSite(null);
           }}
-          onSave={(site) => {
-            const categoryId = editingSite ? editingSite.categoryId : (categories[0]?.id || '');
+          onSave={(site, selectedCategoryId) => {
+            // 使用从模态框传来的分类ID，而不是默认使用第一个分类
+            const categoryId = editingSite 
+              ? editingSite.categoryId 
+              : (selectedCategoryId || categories[0]?.id || '');
             handleSaveSite(site, categoryId);
           }}
           editSite={editingSite?.site}
