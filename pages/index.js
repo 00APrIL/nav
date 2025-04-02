@@ -61,18 +61,41 @@ export default function Home() {
     }
     
     if (editingSite) {
-      // 编辑现有网站
-      setCategories(categories.map(category => {
-        if (category.id === targetCategoryId) {
-          return {
-            ...category,
-            sites: category.sites.map(s => s.id === site.id ? site : s)
+      // 新的逻辑：处理分类可能变化的情况
+      const originalCategoryId = editingSite.categoryId;
+      
+      // 如果分类没有变化，只需要更新现有站点
+      if (originalCategoryId === targetCategoryId) {
+        setCategories(categories.map(category => {
+          if (category.id === targetCategoryId) {
+            return {
+              ...category,
+              sites: category.sites.map(s => s.id === site.id ? site : s)
+            }
           }
-        }
-        return category
-      }))
+          return category;
+        }));
+      } else {
+        // 如果分类发生变化，需要从原分类删除并添加到新分类
+        setCategories(categories.map(category => {
+          if (category.id === originalCategoryId) {
+            // 从原分类中移除
+            return {
+              ...category,
+              sites: category.sites.filter(s => s.id !== site.id)
+            };
+          } else if (category.id === targetCategoryId) {
+            // 添加到新分类
+            return {
+              ...category,
+              sites: [...category.sites, site]
+            };
+          }
+          return category;
+        }));
+      }
     } else {
-      // 添加新网站
+      // 添加新网站的逻辑保持不变
       setCategories(categories.map(category => {
         if (category.id === targetCategoryId) {
           return {
@@ -80,11 +103,12 @@ export default function Home() {
             sites: [...category.sites, { ...site, id: Date.now().toString() }]
           }
         }
-        return category
-      }))
+        return category;
+      }));
     }
-    setShowModal(false)
-    setEditingSite(null)
+    
+    setShowModal(false);
+    setEditingSite(null);
   }
 
   // 删除网站
@@ -224,9 +248,7 @@ export default function Home() {
           }}
           onSave={(site, selectedCategoryId) => {
             // 使用从模态框传来的分类ID，而不是默认使用第一个分类
-            const categoryId = editingSite 
-              ? editingSite.categoryId 
-              : (selectedCategoryId || categories[0]?.id || '');
+            const categoryId = selectedCategoryId || categories[0]?.id || '';
             handleSaveSite(site, categoryId);
           }}
           editSite={editingSite?.site}
