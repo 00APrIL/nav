@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import Head from 'next/head'
-import { FiPlus, FiDownload, FiUpload } from 'react-icons/fi'
+import { FiPlus, FiDownload, FiUpload, FiEdit2, FiTrash2 } from 'react-icons/fi'
 import AddSiteModal from '../components/AddSiteModal'
 import SiteCategory from '../components/SiteCategory'
 
@@ -145,6 +145,41 @@ export default function Home() {
     }
   }
 
+  // 新增: 编辑分类名称
+  const handleEditCategory = (categoryId) => {
+    const category = categories.find(c => c.id === categoryId);
+    if (!category) return;
+    
+    const newName = prompt('更改分类名称:', category.name);
+    if (newName && newName.trim() !== '') {
+      setCategories(categories.map(c => {
+        if (c.id === categoryId) {
+          return { ...c, name: newName };
+        }
+        return c;
+      }));
+    }
+  }
+
+  // 新增: 删除分类
+  const handleDeleteCategory = (categoryId) => {
+    const category = categories.find(c => c.id === categoryId);
+    if (!category) return;
+    
+    // 如果分类中有网站，确认是否删除
+    if (category.sites.length > 0) {
+      if (!confirm(`确定要删除分类"${category.name}"及其包含的${category.sites.length}个网站吗？`)) {
+        return;
+      }
+    } else {
+      if (!confirm(`确定要删除分类"${category.name}"吗？`)) {
+        return;
+      }
+    }
+    
+    setCategories(categories.filter(c => c.id !== categoryId));
+  }
+
   // 导出数据
   const handleExport = () => {
     const dataStr = JSON.stringify(categories, null, 2)
@@ -232,6 +267,9 @@ export default function Home() {
             }}
             onEditSite={(site) => handleEditSite(site, category.id)}
             onDeleteSite={(siteId) => handleDeleteSite(siteId, category.id)}
+            // 新增：传递分类编辑和删除事件处理函数
+            onEditCategory={() => handleEditCategory(category.id)}
+            onDeleteCategory={() => handleDeleteCategory(category.id)}
           />
         ))}
       </main>
